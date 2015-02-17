@@ -114,10 +114,6 @@ var INSPIREDOWN = (function () {
 	}
 
 	function checkHash() {
-		if (/potatono\.github\.io\/inspiredown/.test(window.location.href)) {
-			window.location.href = "http://www.inspiredown.com" + window.location.hash;
-		}
-
 		var currentId = window.location.hash.replace(/^#/,'');
 
 		if (id != currentId) {
