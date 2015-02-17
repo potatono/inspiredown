@@ -4,5 +4,5 @@ Simple tool for creating inspirational countdown timers.  You give it an image U
 and it will give you back a countdown timer.  Everything is saved in Firebase so you can just 
 bookmark the URL to get back to your timer.
 
-[Try it out](http://potatono.github.io/inspiredown/)
+[Try it out](http://www.inspiredown.com/)
 
