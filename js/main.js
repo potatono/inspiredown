@@ -107,13 +107,23 @@ var INSPIREDOWN = (function () {
 	function submitCreate(event) {
 		event.preventDefault();
 
-		var datetime = Date.parse($('#date').val() + " " + $('#time').val());
+		var dts = $('#date').val() + " " + $('#time').val();
+		var datetime = Date.parse(dts);
+		
+		if (isNaN(datetime)) {
+			dts = dts.replace(/\-/g,'/');
+			datetime = Date.parse(dts);
+		}
+
 		var url = $('#url').val();
 		var result;
 
 		result = firebase.child('submissions').push({ 'datetime': datetime, 'url': url }, 
 			function() {
-				window.location.href = window.location.href.replace(/\/create\/?\??/,"/#" + result.key());
+				var url = window.location.href.replace(/\/create\/?\??/,"/#" + result.key());
+				$('#success a').text(url).attr('href',url);
+				$('#success').removeClass("hide");
+				
 			}
 		);	
 	}
