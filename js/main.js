@@ -1,7 +1,7 @@
 var INSPIREDOWN = (function () {
 	var id;
 	var targetDate = new Date((new Date()).getTime()+3888000000);
-	var backgroundUrl = "https://upload.wikimedia.org/wikipedia/commons/8/86/Man_o%27war_cove_near_lulworth_dorset_arp.jpg";
+	var backgroundUrl = "/img/default-bg.jpg";
 	var firebase = new Firebase('https://inspiredown.firebaseio.com/');
 	var exports = {};
 	var timers = [];
@@ -17,12 +17,14 @@ var INSPIREDOWN = (function () {
 				backgroundUrl = val.url;
 
 				initBackground();
+				initIcons();
 				initDimensions();
 				initCountdown();
 			});
 		}
 		else {
 			initBackground();
+			initIcons();
 			initDimensions();
 			initCountdown();
 		}
@@ -48,6 +50,72 @@ var INSPIREDOWN = (function () {
 
 	function initBackground() {
 		$('#main').css('background-image', 'url('+backgroundUrl+')');
+	}
+
+	function paintIcon(img, ctx, size) {
+		if (img.width > 512 && img.height > 512) {
+			ctx.drawImage(img, img.width/2-256, img.height/2-256, 512, 512, 0, 0, size, size);
+		}
+		else {
+			ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, size, size);
+		}
+
+		var diff = getDateDifference();
+		var fontSize = Math.floor((size / (diff.days+'').length) * 1.25);
+
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+		ctx.font = "bold "+fontSize+"px/"+fontSize+"px Helvetica,Arial,sans-serif";
+		ctx.fillStyle = "white";
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 1;
+		ctx.fillText(diff.days, size/2, size/2);
+		ctx.strokeText(diff.days, size/2, size/2);
+	}
+
+	function createIcon(img, rel, size) {
+		var canvas = $('<canvas width="'+size+'" height="'+size+'"></canvas>')[0];
+		var ctx = canvas.getContext('2d');
+
+		paintIcon(img, ctx, size);
+
+		$('head').append($('<link rel="'+rel+'" type="image/png" sizes="'+size+'x'+size+'" href="' + canvas.toDataURL('image/png') + '" />'));
+		$('.page-content').append(canvas);
+	}
+
+	function appendDefaultIcons() {
+		$('head').append($('<link rel="icon" type="image/png" href="/img/favicon.png" />'));
+		$('head').append($('<link rel="apple-touch-icon" href="/img/touch-icon-iphone.png">'));
+    	$('head').append($('<link rel="apple-touch-icon" sizes="76x76" href="/img/touch-icon-ipad.png">'));
+    	$('head').append($('<link rel="apple-touch-icon" sizes="120x120" href="/img/touch-icon-iphone-retina.png">'));
+    	$('head').append($('<link rel="apple-touch-icon" sizes="152x152" href="/img/touch-icon-ipad-retina.png">)'));
+	}
+
+	function initIcons(src) {
+		if (!src) src = backgroundUrl;
+
+		var img = new Image();
+		img.crossOrigin = "anonymous";
+
+		img.onload = function() {
+			createIcon(img, "apple-touch-icon", 60);
+			createIcon(img, "icon", 64);
+			createIcon(img, "apple-touch-icon", 76);
+			createIcon(img, "apple-touch-icon", 120);
+			createIcon(img, "apple-touch-icon", 152);
+		}
+		img.onerror = function(err) {
+			if (img.src == "/img/default-bg.jpg") {
+				console.log("Giving up, using default icons");
+				appendDefaultIcons();
+			}
+			else {
+				console.log("CORS error, using default background");
+				initIcons("/img/default-bg.jpg");
+			}
+		}
+
+		img.src = src;
 	}
 
 	function getDateDifference() {
@@ -116,7 +184,7 @@ var INSPIREDOWN = (function () {
 	function checkHash() {
 		var currentId = window.location.hash.replace(/^#/,'');
 
-		if (id != currentId) {
+		if (currentId && id != currentId) {
 			initData();
 		}
 	}
