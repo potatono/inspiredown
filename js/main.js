@@ -80,7 +80,7 @@ var INSPIREDOWN = (function () {
 		paintIcon(img, ctx, size);
 
 		$('head').append($('<link rel="'+rel+'" type="image/png" sizes="'+size+'x'+size+'" href="' + canvas.toDataURL('image/png') + '" />'));
-		$('.page-content').append(canvas);
+		//$('.page-content').append(canvas);
 	}
 
 	function appendDefaultIcons() {
