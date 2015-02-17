@@ -20,5 +20,17 @@ permalink: /create/
 		<input type="text" class="form-control" id="url">
 	</div>
 
-	<button type="submit" class="btn btn-default">Submit</button>
+	<div class="form-group">
+		<button type="submit" class="btn btn-default">Submit</button>
+	</div>
+
+	<div id="success" class="alert alert-success hide" role="alert">
+		<p><strong>Success!</strong></p> 
+
+		<p>Your countdown timer is live at 
+		<a class="alert-link" href="{{ site.url }}{{ site.baseurl }}#foobar">{{ site.url }}{{ site.baseurl }}#foobar</a>.</p>
+
+		<p>Be sure to bookmark the page so you can get back to it.</p>
+	</div>
+
 </form>
