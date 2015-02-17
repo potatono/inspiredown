@@ -98,11 +98,11 @@ var INSPIREDOWN = (function () {
 		img.crossOrigin = "anonymous";
 
 		img.onload = function() {
-			createIcon(img, "apple-touch-icon", 60);
+			createIcon(img, "apple-touch-icon-precomposed", 60);
 			createIcon(img, "icon", 64);
-			createIcon(img, "apple-touch-icon", 76);
-			createIcon(img, "apple-touch-icon", 120);
-			createIcon(img, "apple-touch-icon", 152);
+			createIcon(img, "apple-touch-icon-precomposed", 76);
+			createIcon(img, "apple-touch-icon-precomposed", 120);
+			createIcon(img, "apple-touch-icon-precomposed", 152);
 		}
 		img.onerror = function(err) {
 			if (img.src == "/img/default-bg.jpg") {
