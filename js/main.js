@@ -104,32 +104,84 @@ var INSPIREDOWN = (function () {
 		$('#main').text(getCountdownString());
 	}
 
+	function validateDate() {
+		var date = $('#date').val();
+		var d = Date.parse(date);
+
+		if (isNaN(d)) { 
+			date.replace(/\-/g,'/'); 
+			d = Date.parse(date);
+		}
+
+		$('#date_error').toggleClass("hide",!isNaN(d));
+	}
+
+	function validateTime() {
+		var time = $('#time').val();
+
+		var d = Date.parse('5/18/2014 ' + time);
+
+		$('#time_error').toggleClass("hide",!isNaN(d));
+	}
+
+	function validateUrl() {
+		var url = $('#url').val();
+		var image = new Image();
+		var timer;
+
+		image.onload = function() { 
+			window.clearTimeout(timer);
+			$('#url_loading').addClass("hide");
+			$('#url_error').addClass('hide');
+		
+		}
+		image.onerror = function() {
+			window.clearTimeout(timer);
+			$('#url_loading').addClass("hide");
+			$('#url_error').removeClass('hide');
+		}
+
+		image.src = url;
+
+		$('#url_error').addClass("hide");
+		$('#url_loading').removeClass("hide");
+
+		timer = window.setTimeout(function() {
+			$('#url_loading').addClass("hide");
+			$('#url_error').removeClass("hide");
+		}, 10000);
+	}
+
 	function submitCreate(event) {
 		event.preventDefault();
 
-		var dts = $('#date').val() + " " + $('#time').val();
-		var datetime = Date.parse(dts);
-		
-		if (isNaN(datetime)) {
-			dts = dts.replace(/\-/g,'/');
-			datetime = Date.parse(dts);
+		if ($('#url_error').hasClass("hide") && 
+			$('#url_loading').hasClass("hide") &&
+			$('#date_error').hasClass("hide") &&
+			$('#time_error').hasClass("hide")) 
+		{
+
+			var dts = $('#date').val().replace(/\-/g,'/') + " " + $('#time').val();
+			var datetime = Date.parse(dts);			
+			var url = $('#url').val();
+			var result;
+
+			result = firebase.child('submissions').push({ 'datetime': datetime, 'url': url }, 
+				function() {
+					var url = window.location.href.replace(/\/create\/?\??/,"/#" + result.key());
+					$('#success a').text(url).attr('href',url);
+					$('#success').removeClass("hide");
+					
+				}
+			);	
 		}
-
-		var url = $('#url').val();
-		var result;
-
-		result = firebase.child('submissions').push({ 'datetime': datetime, 'url': url }, 
-			function() {
-				var url = window.location.href.replace(/\/create\/?\??/,"/#" + result.key());
-				$('#success a').text(url).attr('href',url);
-				$('#success').removeClass("hide");
-				
-			}
-		);	
 	}
 
 	function initCreate() {
 		$('#create').submit(submitCreate);
+		$('#url').blur(validateUrl);
+		$('#date').blur(validateDate);
+		$('#time').blur(validateTime);
 
 		var p = function(v) { return v<10 ? '0'+v : v; }
 		var d = new Date((new Date().getTime()) + 3888000000);
