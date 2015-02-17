@@ -1,14 +1,14 @@
 var INSPIREDOWN = (function () {
-	//var targetDate = new Date(Date.parse("2015-03-31 18:00:00"));
-	//var backgroundUrl = "https://gigaom2.files.wordpress.com/2013/11/img_2575.jpg";
+	var id;
 	var targetDate = new Date((new Date()).getTime()+3888000000);
 	var backgroundUrl = "https://upload.wikimedia.org/wikipedia/commons/8/86/Man_o%27war_cove_near_lulworth_dorset_arp.jpg";
-	var firebase = new Firebase('https://inspiredown.firebaseio.com/')
+	var firebase = new Firebase('https://inspiredown.firebaseio.com/');
 	var exports = {};
+	var timers = [];
 
 	function initData() {
 		if (window.location.hash) {
-			var id = window.location.hash.replace(/^#/,'');
+			id = window.location.hash.replace(/^#/,'');
 			$('header').css('display','none');
 			$('footer').css('display','none');
 			firebase.child('submissions').child(id).once('value', function(snap) {
@@ -96,12 +96,29 @@ var INSPIREDOWN = (function () {
 		return result;
 	}
 
+	function resetTimers() {
+		for (var i=0; i<timers.length; i++) {
+			window.clearInterval(timers[i]);
+		}
+		timers = [];
+	}
+
 	function initCountdown() {
-		window.setInterval(paintCountdown, 100);
+		resetTimers();
+		timers.push(window.setInterval(paintCountdown, 100));
+		timers.push(window.setInterval(checkHash, 1000));
 	}
 
 	function paintCountdown() {
 		$('#main').text(getCountdownString());
+	}
+
+	function checkHash() {
+		var currentId = window.location.hash.replace(/^#/,'');
+
+		if (id != currentId) {
+			initData();
+		}
 	}
 
 	function validateDate() {
