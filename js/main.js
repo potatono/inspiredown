@@ -1,7 +1,7 @@
 var INSPIREDOWN = (function () {
 	var id;
 	var targetDate = new Date((new Date()).getTime()+3888000000);
-	var backgroundUrl = "/img/default-bg.jpg";
+	var backgroundUrl = "http://www.inspiredown.com/img/default-bg.jpg";
 	var firebase = new Firebase('https://inspiredown.firebaseio.com/');
 	var exports = {};
 	var timers = [];
