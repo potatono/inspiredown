@@ -140,6 +140,12 @@ var INSPIREDOWN = (function () {
 		};
 	}
 
+    function getCountdownTitle() {
+        var diff = getDateDifference();
+
+		return diff.days + "d " + diff.hours + "h " + diff.minutes + "m";
+    }
+
 	function getCountdownString() {
 		var diff = getDateDifference();
 		var windowWidth = $(window).width();
@@ -179,6 +185,11 @@ var INSPIREDOWN = (function () {
 
 	function paintCountdown() {
 		$('#main').text(getCountdownString());
+
+        if (id) {
+            document.title = getCountdownTitle();
+        }
+            
 	}
 
 	function checkHash() {
