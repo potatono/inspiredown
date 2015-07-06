@@ -6,15 +6,28 @@ var INSPIREDOWN = (function () {
 	var exports = {};
 	var timers = [];
 
+    function getId() {
+        if (window.location.hash)
+            return window.location.hash.replace(/^#/,'');
+        else if (window.location.search)
+            return window.location.search.replace(/^\?/,'');
+        else if (/\?[\w\-]+/.test(window.location.href)) 
+            return window.location.href.replace(/.+?\?([\w\-]+).*/,'$1');
+        else
+            return null;
+    }
+
 	function initData() {
-		if (window.location.hash) {
-			id = window.location.hash.replace(/^#/,'');
+        var id = getId();
+        console.log("Id is ",id);
+		if (id) {
 			$('header').css('display','none');
 			$('footer').css('display','none');
 			firebase.child('submissions').child(id).once('value', function(snap) {
 				var val = snap.val();
 				targetDate = new Date(val.datetime);
-				backgroundUrl = val.url;
+				//backgroundUrl = val.url;
+                backgroundUrl = "http://proxy.inspiredown.com/?" + id;
 
 				initBackground();
 				initIcons();
@@ -264,7 +277,7 @@ var INSPIREDOWN = (function () {
 
 			result = firebase.child('submissions').push({ 'datetime': datetime, 'url': url }, 
 				function() {
-					var url = window.location.href.replace(/\/create\/?\??/,"/#" + result.key());
+					var url = window.location.href.replace(/\/create\/?\??/,"/?" + result.key());
 					$('#success a').text(url).attr('href',url);
 					$('#success').removeClass("hide");
 					
