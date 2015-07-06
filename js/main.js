@@ -1,6 +1,7 @@
 var INSPIREDOWN = (function () {
 	var id;
 	var targetDate = new Date((new Date()).getTime()+3888000000);
+    var backupUrl = "http://www.inspiredown.com/img/default-bg.jpg";
 	var backgroundUrl = "http://www.inspiredown.com/img/default-bg.jpg";
 	var firebase = new Firebase('https://inspiredown.firebaseio.com/');
 	var exports = {};
@@ -18,15 +19,15 @@ var INSPIREDOWN = (function () {
     }
 
 	function initData() {
-        var id = getId();
-        console.log("Id is ",id);
+        id = getId();
+        
 		if (id) {
 			$('header').css('display','none');
 			$('footer').css('display','none');
 			firebase.child('submissions').child(id).once('value', function(snap) {
 				var val = snap.val();
 				targetDate = new Date(val.datetime);
-				//backgroundUrl = val.url;
+				backupUrl = val.url;
                 backgroundUrl = "http://proxy.inspiredown.com/?" + id;
 
 				initBackground();
@@ -86,22 +87,13 @@ var INSPIREDOWN = (function () {
 		ctx.strokeText(diff.days, size/2, size/2);
 	}
 
-	function createIcon(img, rel, size) {
+	function createIcon(img, id, size) {
 		var canvas = $('<canvas width="'+size+'" height="'+size+'"></canvas>')[0];
 		var ctx = canvas.getContext('2d');
 
 		paintIcon(img, ctx, size);
 
-		$('head').append($('<link rel="'+rel+'" type="image/png" sizes="'+size+'x'+size+'" href="' + canvas.toDataURL('image/png') + '" />'));
-		//$('.page-content').append(canvas);
-	}
-
-	function appendDefaultIcons() {
-		$('head').append($('<link rel="icon" type="image/png" href="/img/favicon.png" />'));
-		$('head').append($('<link rel="apple-touch-icon" href="/img/touch-icon-iphone.png">'));
-    	$('head').append($('<link rel="apple-touch-icon" sizes="76x76" href="/img/touch-icon-ipad.png">'));
-    	$('head').append($('<link rel="apple-touch-icon" sizes="120x120" href="/img/touch-icon-iphone-retina.png">'));
-    	$('head').append($('<link rel="apple-touch-icon" sizes="152x152" href="/img/touch-icon-ipad-retina.png">)'));
+        $('#'+id).attr('href', canvas.toDataURL('image/png'));
 	}
 
 	function initIcons(src) {
@@ -110,22 +102,12 @@ var INSPIREDOWN = (function () {
 		var img = new Image();
 		img.crossOrigin = "anonymous";
 
-		img.onload = function() {
-			createIcon(img, "apple-touch-icon-precomposed", 60);
-			createIcon(img, "icon", 64);
-			createIcon(img, "apple-touch-icon-precomposed", 76);
-			createIcon(img, "apple-touch-icon-precomposed", 120);
-			createIcon(img, "apple-touch-icon-precomposed", 152);
-		}
+		img.onload = function() { createIcon(img, "favicon", 64); }
 		img.onerror = function(err) {
-			if (img.src == "/img/default-bg.jpg") {
-				console.log("Giving up, using default icons");
-				appendDefaultIcons();
-			}
-			else {
-				console.log("CORS error, using default background");
-				initIcons("/img/default-bg.jpg");
-			}
+            console.log("Error loading background: " + err + ". Falling back to direct load.");
+            backgroundUrl = backupUrl;
+            initBackground();
+            initIcons();
 		}
 
 		img.src = src;
